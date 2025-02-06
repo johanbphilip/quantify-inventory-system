@@ -1,19 +1,19 @@
 import { useState } from 'react';
 
-export default function CategorySelector() {
-  const tempCategories = ['Food', 'Drink', 'Add New']; //TODO: this has to be dynamically retrieved
-  const [categories, setCategories] = useState(tempCategories);
-
-  const [selection, setSelection] = useState(''); // Selected options
+export default function CategorySelector({ tempCategories, value, onChange }) {
+  const [categories, setCategories] = useState([...tempCategories]);
+  // const [selection, setSelection] = useState(''); // Selected option
   const [inputValue, setInputValue] = useState(''); // User input
   const [showDropdown, setShowDropdown] = useState(false); // Dropdown visibility
-
+  // setCategory(selection);
   // Handles adding a new or existing category
   const handleAddCategory = (category) => {
     if (!categories.includes(category)) {
       setCategories([...categories, category]); // Add selection
     }
-    setSelection(category);
+    // updateCategories(category, categories.length + 1);
+    onChange(category);
+    // setSelection(category);
     setInputValue('');
     setShowDropdown(false);
   };
@@ -21,14 +21,16 @@ export default function CategorySelector() {
   // Handles creating a new category
   const handleCreateCategory = () => {
     if (inputValue.trim() && !categories.includes(inputValue)) {
-      setSelection(inputValue); // Add to list
+      onChange(inputValue);
+      // setSelection(inputValue); // Add to list
     }
     handleAddCategory(inputValue);
   };
 
   // Handles removing a selected category
   const handleRemoveCategory = () => {
-    setSelection('');
+    // setSelection('');
+    onChange('');
   };
 
   return (
@@ -37,15 +39,15 @@ export default function CategorySelector() {
     >
       {/* Input field with dropdown */}
       <div className="flex gap-2">
-        {selection && (
+        {value && (
           <div
-            key={selection}
-            className="flex items-center bg-quantHighlight rounded text-md px-2 gap-2 w-fit"
+            key={value}
+            className="flex items-center bg-quantHighlight rounded text-md text-white px-2 gap-2 min-w-fit"
           >
-            {selection}
+            {value}
             <button
-              onClick={() => handleRemoveCategory(selection)}
-              className=" text-quantGray hover:text-white font-bold"
+              onClick={() => handleRemoveCategory(value)}
+              className=" text-white font-bold"
             >
               ✕
             </button>
@@ -73,7 +75,7 @@ export default function CategorySelector() {
             .map((category) => (
               <div
                 key={category}
-                className="px-2 py-0 hover:bg-gray-100 cursor-pointer rounded-md"
+                className="p-2 hover:bg-gray-100 cursor-pointer rounded-md"
                 onClick={() => handleAddCategory(category)}
               >
                 {category}
@@ -82,11 +84,11 @@ export default function CategorySelector() {
 
           {/* Create new option */}
           {inputValue.trim() && !categories.includes(inputValue) && (
-            <div
-              className="p-2 bg-green-100 hover:bg-green-200 cursor-pointer"
-              onClick={handleCreateCategory}
-            >
-              ➕ Create new: <strong>{inputValue}</strong>
+            <div className="p-2 cursor-pointer" onClick={handleCreateCategory}>
+              Create{' '}
+              <span className="bg-quantHighlight text-white px-2 py-1 rounded-md">
+                {inputValue}
+              </span>
             </div>
           )}
         </div>

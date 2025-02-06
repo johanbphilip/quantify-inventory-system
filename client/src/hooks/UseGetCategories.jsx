@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { server } from '../axios';
 
 export const UseGetCategories = () => {
@@ -8,15 +8,17 @@ export const UseGetCategories = () => {
   const getCategories = async () => {
     try {
       setIsLoading(true);
-      const { data, message, error } = await server.get('/api/categories').data;
+      console.log('about to hit endpoint');
+      const { data, message, error } = (await server.get('/api/item/category'))
+        .data;
       setIsLoading(false);
       if (error) {
         setErrorMessage(message);
         setIsLoading(false);
         return;
       }
-      console.log('UseGetCategories data: ', data);
-      setCategories(data);
+      console.log('UseGetCategories data: ', data[1].options);
+      setCategories(data[1].options);
       setErrorMessage('');
     } catch (error) {
       setErrorMessage('An error occured while fetching data');
@@ -49,6 +51,9 @@ export const UseGetCategories = () => {
       return;
     }
   };
+  useEffect(() => {
+    getCategories();
+  }, []);
   return {
     categories,
     errorMessage,
