@@ -2,18 +2,13 @@
 import { Copy, CopyIcon, Edit, EditIcon, MoreHorizontal } from 'lucide-react';
 
 import { ColumnDef } from '@tanstack/react-table';
-import { InventoryItem, dummyItems } from '@/lib/types/inventory-item';
+import { InventoryItem } from '@/lib/types/inventory-item-schema';
 import { EditItemSheet } from '@/components/my-components/edit-item-sheet';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+
 import { Button } from '@/components/ui/button';
 import { CustomTooltip } from '@/components/my-components/custom-tooltip';
+import StatusBadge from '@/components/my-components/status-badge';
+import { Status } from '@/lib/types/status';
 
 export const columns: ColumnDef<InventoryItem>[] = [
   {
@@ -21,8 +16,20 @@ export const columns: ColumnDef<InventoryItem>[] = [
     header: 'Item',
   },
   {
+    accessorKey: 'isFavourite',
+    header: 'Favourite',
+  },
+  {
     accessorKey: 'status',
     header: 'Status',
+    cell: ({ row }) => {
+      const status: Status = row.getValue('status');
+      return (
+        <div className="flex justify-start items-center gap-2 w-4/5">
+          <StatusBadge status={status} />
+        </div>
+      );
+    },
   },
   {
     accessorKey: 'quantity',
@@ -45,19 +52,14 @@ export const columns: ColumnDef<InventoryItem>[] = [
     accessorKey: 'category',
     header: 'Category',
   },
-  {
-    id: 'editItem',
-    cell: ({ row }) => {
-      const item = row.original;
-      return <EditItemSheet itemName={item.itemName} />;
-    },
-  },
+
   {
     id: 'actions',
+    header: 'Actions',
     cell: ({ row }) => {
       const item = row.original;
       return (
-        <div className="flex justify-center gap-2 ">
+        <div className="flex justify-start items-center gap-2 ">
           <CustomTooltip description="Copy Item Name">
             <Button
               onClick={() => navigator.clipboard.writeText(item.itemName)}
@@ -66,7 +68,8 @@ export const columns: ColumnDef<InventoryItem>[] = [
               <CopyIcon />
             </Button>
           </CustomTooltip>
-          <EditItemSheet itemName={item.itemName}>
+
+          <EditItemSheet itemName={item.itemName} item={item}>
             <EditIcon className="stroke-primary" />
           </EditItemSheet>
         </div>

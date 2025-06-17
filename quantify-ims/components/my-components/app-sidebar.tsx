@@ -40,11 +40,11 @@ const data = {
       url: '/dashboard',
       icon: LayoutDashboard,
     },
-    {
-      title: 'All Products',
-      url: '/all-products',
-      icon: BoxIcon,
-    },
+    // {
+    //   title: 'All Products',
+    //   url: '/all-products',
+    //   icon: BoxIcon,
+    // },
     {
       title: 'Search',
       url: '/search',

@@ -1,12 +1,10 @@
-// import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 
-export async function getAllItems() {
+export async function getAllTransactions() {
   try {
-    const response = await fetch('http://localhost:8080/api/item/all', {
+    const response = await fetch('http://localhost:8080/api/transactions/all', {
       method: 'GET',
       credentials: 'include',
-      cache: 'no-store',
       headers: {
         Cookie: (await cookies()).toString(),
       },
@@ -15,20 +13,19 @@ export async function getAllItems() {
       console.log(response);
       return response.status;
     }
-
     const { data } = await response.json();
-
+    console.log(data);
     if (data.error) {
       return {
         error: data.error,
       };
     }
-    // revalidatePath('/dashboard');
     return data;
   } catch (error) {
-    console.error('Error fetching items:', error);
+    console.error('Error fetching transactions:', error);
     return {
-      error: 'An error occurred while fetching items. Please try again later.',
+      error:
+        'An error occurred while fetching transactions. Please try again later.',
     };
   }
 }

@@ -5,10 +5,12 @@ import jwt from 'jsonwebtoken';
 dotenv.config();
 
 export const authenticateRequest = async (req, res, next) => {
+  console.log('inside middleware');
   const accessToken = req.cookies.access_token;
   const refreshToken = req.cookies.refresh_token;
 
   if (!accessToken && !refreshToken) {
+    console.log('didnt find any tokens');
     return res.status(401).json({
       valid: false,
       message: 'Unauthorized: No tokens provided. From the middleware',

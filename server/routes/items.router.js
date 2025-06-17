@@ -29,6 +29,7 @@ router.put('/category/:id', updateCategory);
 // always have :id at the end
 router.get('/:id', getItemById);
 router.put('/:id', updateItem);
+console.log('inside items router');
 router.delete('/:id', deleteItem);
 
 //TODO:

@@ -53,7 +53,6 @@ export async function login(
         .find((cookie) => cookie.includes(refreshKey))
         ?.split('=')[1]
         .split(';')[0];
-      console.log(refreshCookie);
       if (refreshCookie) {
         (await cookies()).set(refreshKey, refreshCookie);
       }
@@ -62,7 +61,6 @@ export async function login(
         .find((cookie) => cookie.includes(accessKey))
         ?.split('=')[1]
         .split(';')[0];
-      console.log(accessCookie);
       if (accessCookie) {
         (await cookies()).set(accessKey, accessCookie);
       }
@@ -70,7 +68,7 @@ export async function login(
       return {
         success: true,
         user: data.user,
-        redirect: '/protected/dashboard',
+        redirect: '/dashboard',
       };
     } catch (error) {
       console.error('Login error:', error);

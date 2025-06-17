@@ -20,16 +20,19 @@ export function NavMain({
       <SidebarGroupContent>
         <SidebarMenu>
           <SidebarMenuItem>
-            {/* <SidebarMenuButton
-              className="bg-accent-foreground text-primary-foreground duration-500 ease-in-out hover:bg-primary hover:text-primary-foreground mb-2 "
+            <SidebarMenuButton
+              className="bg-accent-foreground text-white dark:text-black duration-500 ease-in-out hover:bg-primary hover:dark:text-white mb-2 "
               tooltip={'Quick Create'}
               onClick={() => {
                 // Handle quick create action here
               }}
+              asChild
             >
-              <PlusIcon />
-              <span>Quick Create</span>
-            </SidebarMenuButton> */}
+              <Link href={'/add'}>
+                <PlusIcon />
+                <span>Quick Create</span>
+              </Link>
+            </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
         <SidebarMenu className="gap-2">

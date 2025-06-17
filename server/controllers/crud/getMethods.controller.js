@@ -7,7 +7,7 @@ export const getAllItems = async (req, res) => {
       .from('inventory')
       .select()
       .order('itemName', { ascending: true });
-    console.log(data);
+
     if (!data) {
       console.log('Empty inventory');
 
