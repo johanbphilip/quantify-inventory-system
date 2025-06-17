@@ -21,13 +21,16 @@ import { deleteItem } from '../controllers/crud/deleteMethods.controller.js';
 router.post('/', createNewItem);
 router.get('/', getItemByName);
 router.get('/all', getAllItems);
-router.get('/:id', getItemById);
-router.put('/:id', updateItem);
-router.delete('/:id', deleteItem);
-
 router.get('/favourites', getFavouriteItems);
 router.get('/levels', getItemLevels);
 router.get('/category', getCategories);
 router.put('/category/:id', updateCategory);
+
+// always have :id at the end
+router.get('/:id', getItemById);
+router.put('/:id', updateItem);
+console.log('inside items router');
+router.delete('/:id', deleteItem);
+
 //TODO:
 // router.get('/category/:category', fetchSpecificCategory);

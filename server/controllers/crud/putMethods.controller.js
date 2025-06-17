@@ -41,7 +41,7 @@ export const updateItem = async (req, res) => {
       return res.status(400).json({ error, message: error.message });
     }
     console.log('about to run transactionLogger');
-    await transactionLogger(data[0].id, itemName, 'UPDATE', data);
+    await transactionLogger(data[0].id, itemName, 'Update Item', data[0]);
     res.status(200).json(data);
   } catch (error) {
     res.status(500).send({ error, message: error.message });

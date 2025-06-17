@@ -11,7 +11,7 @@ export const createNewItem = async (req, res) => {
       category,
       storageLocation,
       status,
-      statusColor,
+      isFavourite,
     } = req.body;
 
     const { data, error } = await supabase
@@ -24,7 +24,7 @@ export const createNewItem = async (req, res) => {
         reorderPoint: reorderPoint,
         category: category,
         storageLocation: storageLocation,
-        statusColor: statusColor,
+        isFavourite: isFavourite,
       })
       .select('*');
     console.log(data);
@@ -40,10 +40,12 @@ export const createNewItem = async (req, res) => {
     }
 
     console.log(data);
-    await transactionLogger(data[0].id, itemName, 'ADD', data);
-    return res
-      .status(201)
-      .json({ data, message: `Item added to inventory successfully` });
+    await transactionLogger(data[0].id, itemName, 'Add Item', null);
+    return res.status(201).json({
+      data,
+      success: true,
+      message: `Item added to inventory successfully`,
+    });
   } catch (error) {
     console.log(error);
     return res.status(500).json(error);
