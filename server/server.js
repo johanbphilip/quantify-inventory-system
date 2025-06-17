@@ -20,9 +20,14 @@ app.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
 app.use(express.json());
 app.use(cookieParser());
 // update the origin to be a secure env var
-app.use(cors({ origin: 'http://localhost:5173', credentials: true }));
-
-app.use('/api/*', authenticateRequest);
+app.use(
+  cors({
+    origin: 'http://localhost:3000',
+    credentials: true,
+    exposedHeaders: ['set-cookie'], // Helps with debugging
+  }),
+);
+app.use('/api', authenticateRequest);
 app.use('/auth', authRouter);
 app.use('/api/item', itemsRouter);
 app.use('/api/transactions', transactionRouter);

@@ -7,7 +7,7 @@ export const getAllItems = async (req, res) => {
       .from('inventory')
       .select()
       .order('itemName', { ascending: true });
-    console.log(data);
+
     if (!data) {
       console.log('Empty inventory');
 
@@ -113,10 +113,12 @@ export const getItemLevels = async (req, res) => {
 
 export const getCategories = async (req, res) => {
   try {
+    console.log('getting data');
     const { data, error } = await supabase
       .from('selections')
-      .eq('selectionValue', 'Category')
-      .select('options');
+      .select('options')
+      .eq('selectionValue', 'Category');
+
     console.log(data);
     if (error) {
       return res.status(404).json({ error, message: error.message });
