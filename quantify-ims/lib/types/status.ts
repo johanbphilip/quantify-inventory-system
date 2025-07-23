@@ -12,6 +12,7 @@ export type Levels = {
   items: InventoryItem[];
   count: number;
 };
+
 export enum StatusBackgroundColor {
   SUFFICIENT_STOCK = 'bg-green-100',
   LOW_STOCK = 'bg-yellow-100',
@@ -29,4 +30,11 @@ export enum StatusCircleColor {
   LOW_STOCK = 'bg-yellow-600',
   CRITICAL_STOCK = 'bg-red-600',
   OUT_OF_STOCK = 'bg-gray-600',
+}
+
+export enum StatusTextColor {
+  SUFFICIENT_STOCK = 'text-green-600',
+  LOW_STOCK = 'text-yellow-600',
+  CRITICAL_STOCK = 'text-red-600',
+  OUT_OF_STOCK = 'text-gray-600',
 }

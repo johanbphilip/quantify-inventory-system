@@ -10,11 +10,9 @@ export async function getAllTransactions() {
       },
     });
     if (!response.ok) {
-      console.log(response);
       return response.status;
     }
     const { data } = await response.json();
-    console.log(data);
     if (data.error) {
       return {
         error: data.error,

@@ -1,20 +1,29 @@
 'use server';
 
-import { LoginFormSchema } from '../types/login-form';
 import { cookies } from 'next/headers';
+import { SignUpFormSchema } from '../types/sign-up-form';
 
-type LoginFormState = {
+type SignUpFormState = {
+  firstName: '';
+  lastName: '';
   email: '';
   password: '';
+  organization: '';
 };
-export async function login(
-  previousState: LoginFormState,
+export async function signUp(
+  previousState: SignUpFormState,
   formData: FormData,
 ): Promise<any> {
+  const firstName = formData.get('firstName');
+  const lastName = formData.get('lastName');
+  const organization = formData.get('organization');
   const email = formData.get('email');
   const password = formData.get('password');
 
-  const validatedFields = LoginFormSchema.safeParse({
+  const validatedFields = SignUpFormSchema.safeParse({
+    firstName,
+    lastName,
+    organization,
     email,
     password,
   });
@@ -27,12 +36,18 @@ export async function login(
 
   if (validatedFields.success) {
     try {
-      const response = await fetch('http://localhost:8080/auth/login', {
+      const response = await fetch('http://localhost:8080/auth/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({
+          firstName,
+          lastName,
+          organization,
+          email,
+          password,
+        }),
         credentials: 'include', // This is crucial
         cache: 'no-store', // Avoid caching issues
       });

@@ -2,8 +2,8 @@
 import {
   ArrowUpCircleIcon,
   BellIcon,
-  BoxIcon,
   ChartColumnBig,
+  Circle,
   Component,
   HeartIcon,
   HistoryIcon,
@@ -27,6 +27,7 @@ import Link from 'next/link';
 import { NavMain } from './nav-main';
 import { NavGeneral } from './nav-general';
 import { ModeToggle } from './mode-toggle';
+import { NavProfile } from './nav-profile';
 
 // Menu items.
 const data = {
@@ -55,6 +56,11 @@ const data = {
       title: 'Favourites',
       url: '/favourites',
       icon: HeartIcon,
+    },
+    {
+      title: 'Status',
+      url: '/status',
+      icon: Circle,
     },
     {
       title: 'Categories',
@@ -114,6 +120,7 @@ export function AppSidebar() {
       </SidebarContent>
       <SidebarRail />
       <SidebarFooter className="mb-20">
+        <NavProfile />
         <ModeToggle />
       </SidebarFooter>
     </Sidebar>

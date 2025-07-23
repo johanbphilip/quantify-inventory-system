@@ -3,6 +3,7 @@ import {
   StatusBackgroundColor,
   StatusBorderColor,
   StatusCircleColor,
+  StatusTextColor,
 } from '@/lib/types/status';
 import { cn } from '@/lib/utils';
 
@@ -31,17 +32,24 @@ export default function StatusBadge({
     [Status.CRITICAL_STOCK]: StatusCircleColor.CRITICAL_STOCK,
     [Status.OUT_OF_STOCK]: StatusCircleColor.OUT_OF_STOCK,
   };
+  const textVariant = {
+    [Status.SUFFICIENT_STOCK]: StatusTextColor.SUFFICIENT_STOCK,
+    [Status.LOW_STOCK]: StatusTextColor.LOW_STOCK,
+    [Status.CRITICAL_STOCK]: StatusTextColor.CRITICAL_STOCK,
+    [Status.OUT_OF_STOCK]: StatusTextColor.OUT_OF_STOCK,
+  };
   return (
     <div
       className={cn(
-        `rounded-md px-3 py-1  border flex gap-2 items-center text-${circleVariant[status]} text-sm h-9'`,
+        `rounded-md px-3 py-1  border flex gap-2 items-center text-sm h-9'`,
         className,
+        textVariant[status],
         backgroundVariant[status],
         borderVariant[status],
       )}
     >
-      <div className={`rounded-full ${circleVariant[status]} size-4`}></div>
-      <p className="text-black">{status}</p>
+      <div className={cn('rounded-full size-4', circleVariant[status])}></div>
+      <p>{status}</p>
     </div>
   );
 }

@@ -22,10 +22,10 @@ export default function LoginForm() {
     }
   }, [state]);
   return (
-    <Card>
+    <Card className="w-2/3  border-none">
       <CardHeader>
         <CardTitle>
-          <h1 className="text-2xl font-bold">Welcome Back!</h1>
+          <h1 className="text-4xl font-bold">Welcome Back!</h1>
         </CardTitle>
         <CardDescription>
           <p className="text-muted-foreground">
@@ -39,7 +39,7 @@ export default function LoginForm() {
             <Label htmlFor="email">Email</Label>
             <input
               type="email"
-              placeholder="Email"
+              placeholder="Enter your email"
               id="email"
               name="email"
               className="border rounded-md p-2"
@@ -60,7 +60,7 @@ export default function LoginForm() {
           </div>
           <input
             type="password"
-            placeholder="Password"
+            placeholder="Enter your password"
             id="password"
             name="password"
             className="border rounded-md p-2"
@@ -76,43 +76,11 @@ export default function LoginForm() {
           </button>
           <p className="w-full text-center text-sm text-muted-foreground">
             Don't have an account?{' '}
-            <Link href="/auth/register" className="text-primary">
+            <Link href="/auth/sign-up" className="text-primary">
               Register here
             </Link>
           </p>
         </form>
-
-        <CardFooter>
-          <p>
-            Need help?{' '}
-            <Link href="/auth/support" className="">
-              Contact Support
-            </Link>
-          </p>
-        </CardFooter>
-        {/* <div className="flex items-center justify-center mt-4">
-          <p className="text-sm text-gray-500">Or log in with:</p>
-          <div className="flex gap-2 mt-2">
-            <Link
-              href="/auth/login/google"
-              className="bg-red-500 text-white rounded p-2 hover:bg-red-600 transition duration-200"
-            >
-              Google
-            </Link>
-            <Link
-              href="/auth/login/facebook"
-              className="bg-blue-600 text-white rounded p-2 hover:bg-blue-700 transition duration-200"
-            >
-              Facebook
-            </Link>
-            <Link
-              href="/auth/login/github"
-              className="bg-gray-800 text-white rounded p-2 hover:bg-gray-900 transition duration-200"
-            >
-              GitHub
-            </Link>
-          </div>
-        </div> */}
       </CardContent>
     </Card>
   );

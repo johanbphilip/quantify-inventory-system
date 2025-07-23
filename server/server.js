@@ -8,6 +8,7 @@ import { authenticateRequest } from './middleware/authMiddleware.js';
 import { router as itemsRouter } from './routes/items.router.js';
 import { router as authRouter } from './routes/auth.router.js';
 import { router as transactionRouter } from './routes/transactions.router.js';
+import { router as profileRouter } from './routes/profile.router.js';
 
 const app = express();
 const PORT = process.env.PORT;
@@ -29,6 +30,7 @@ app.use(
 );
 app.use('/api', authenticateRequest);
 app.use('/auth', authRouter);
+app.use('/profile', profileRouter);
 app.use('/api/item', itemsRouter);
 app.use('/api/transactions', transactionRouter);
 

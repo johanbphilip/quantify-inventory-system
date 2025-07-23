@@ -48,18 +48,18 @@ export const columns: ColumnDef<InventoryItem>[] = [
     },
   },
 
-  {
-    accessorKey: 'status',
-    header: 'Status',
-    cell: ({ row }) => {
-      const status: Status = row.getValue('status');
-      return (
-        <div className="flex justify-start items-center gap-2 w-4/5">
-          <StatusBadge status={status} className="w-full" />
-        </div>
-      );
-    },
-  },
+  // {
+  //   accessorKey: 'status',
+  //   header: 'Status',
+  //   cell: ({ row }) => {
+  //     const status: Status = row.getValue('status');
+  //     return (
+  //       <div className="flex justify-start items-center gap-2 w-4/5">
+  //         <StatusBadge status={status} className="w-full" />
+  //       </div>
+  //     );
+  //   },
+  // },
   {
     accessorKey: 'quantity',
     header: ({ column }) => {

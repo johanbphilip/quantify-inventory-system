@@ -7,6 +7,7 @@ import {
   signout,
   getUser,
 } from '../controllers/auth/auth.controllers.js';
+import { getUserProfile } from '../controllers/profile/profile.controllers.js';
 
 export const router = express.Router();
 

@@ -22,24 +22,18 @@ export default function EditItemForm({ item }: { item: InventoryItem }) {
 
   useEffect(() => {
     if (state?.success) {
-      toast.success(
-        <h1 className="text-lg font-bold">Item Updated</h1>,
-        {
-          description: 'Item updated successfully',
-          duration: 4000,
-        },
-      );
+      toast.success(<h1 className="text-lg font-bold">Item Updated</h1>, {
+        description: 'Item updated successfully',
+        duration: 4000,
+      });
       router.refresh();
       sheetCloseRef.current && sheetCloseRef.current.click();
     }
     if (state?.error) {
-      toast.error(
-        <h1 className="text-lg font-bold">Update Failed</h1>,
-        {
-          description: 'Item could not be updated. Please try again',
-          duration: 4000,
-        },
-      );
+      toast.error(<h1 className="text-lg font-bold">Update Failed</h1>, {
+        description: state.error || 'An error occurred while updating the item',
+        duration: 4000,
+      });
       // router.refresh();
       // sheetCloseRef.current && sheetCloseRef.current.click();
     }

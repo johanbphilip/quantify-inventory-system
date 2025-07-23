@@ -1,0 +1,11 @@
+import { z } from 'zod';
+
+export const SignUpFormSchema = z.object({
+  firstName: z.string().min(1, 'First name is required'),
+  lastName: z.string().min(1, 'Last name is required'),
+  email: z.string().email('Invalid email address'),
+  password: z.string().min(8, 'Password must be at least 8 characters long'),
+  organization: z.string().nullable().optional(),
+});
+
+export type SignUpFormType = z.infer<typeof SignUpFormSchema>;
