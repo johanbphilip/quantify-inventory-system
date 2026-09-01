@@ -1,6 +1,6 @@
 # Quantify Inventory System
 
-Quantify Inventory System is a web application for digitizing inventory. It gives staff a searchable inventory, stock-level visibility, item CRUD operations, favourites, transaction history, and authenticated access.
+Quantify Inventory System is a web application for digitizing and managing inventory for organizations with recurring setup and teardown operations. Its planned product model gives organizations multiple teams, team-owned catalog items and kits, individually tracked assets, person-based checkout, and auditable operational history.
 
 ## Repository Layout
 
@@ -8,6 +8,7 @@ Quantify Inventory System is a web application for digitizing inventory. It give
 | --- | --- |
 | `quantify-ims/` | Next.js client application |
 | `server/` | Express API and authentication middleware |
+| `product-requirement-document.md` | Product requirements, data model, and versioned roadmap |
 | `TODO.md` | Active feature backlog and product questions |
 | `AGENTS.md` | Repository guidance for contributors and coding agents |
 
@@ -41,6 +42,19 @@ Quantify Inventory System is a web application for digitizing inventory. It give
 - Authentication uses short-lived `access_token` and longer-lived `refresh_token` HTTP-only cookies. The API middleware refreshes the session when only a valid refresh token remains.
 - Shared client UI belongs in `quantify-ims/components/`; domain actions belong in `quantify-ims/lib/actions/`; shared types and schemas belong in `quantify-ims/lib/types/`.
 - Keep Supabase access on the server. Do not expose service credentials or move privileged database operations into client components.
+
+## Product Direction
+
+The current implementation provides an item-centric inventory baseline. The approved product direction in [product-requirement-document.md](product-requirement-document.md) expands this into:
+
+- Organization onboarding for teams, team categories, and organization locations
+- Team-owned Catalog Items and Kits
+- Catalog Items with either bulk quantities or uniquely tracked Asset records
+- Derived asset counts, optional asset barcodes, and person-based checkout
+- Team-scoped operational permissions with organization-wide administrative visibility
+- Team-owned Flow templates, followed later by organization master event Flows
+
+The PRD roadmap places onboarding in Version `0.2`, the Inventory Directory in Version `0.3`, and the Catalog Item and Asset model in the Inventory Directory and Accountability releases.
 
 ## Prerequisites
 
