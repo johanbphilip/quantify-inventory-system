@@ -24,18 +24,18 @@ Quantify Inventory System is an inventory application. The repository contains a
 
 ## Development Commands
 
-Run client commands from `quantify-ims/`:
+Run client commands from `quantify-ims/` with pnpm:
 
 ```bash
-npm run dev
-npm run build
-npm run lint
+pnpm dev
+pnpm build
+pnpm lint
 ```
 
-Run server commands from `server/`:
+Run server commands from `server/` with pnpm:
 
 ```bash
-npm run dev
+pnpm dev
 ```
 
 The local client expects the API at `http://localhost:8080`; the API expects the client at `http://localhost:3000` for CORS. The server requires `PORT`, `SUPABASE_URL`, and `ANON_KEY` in `server/.env`.
@@ -55,7 +55,7 @@ The local client expects the API at `http://localhost:8080`; the API expects the
 
 ## Validation
 
-- For client changes, run `npm run lint` and, when practical, `npm run build` from `quantify-ims/`.
+- For client changes, run `pnpm lint` and, when practical, `pnpm build` from `quantify-ims/`.
 - For server changes, run the available ESLint command or inspect the changed module with the local runtime. The server currently has no automated test script.
 - For API or authentication changes, verify the affected request manually with both valid and unauthenticated sessions when possible.
 - Review `git diff` and `git status` before handing off work.

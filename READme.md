@@ -59,7 +59,7 @@ The PRD roadmap places onboarding in Version `0.2`, the Inventory Directory in V
 ## Prerequisites
 
 - Node.js 20 or later
-- npm
+- pnpm 10.34.3 or later
 - A Supabase project with the expected `inventory` and `selections` tables and Auth configured
 
 ## Clone and Develop
@@ -71,13 +71,11 @@ The PRD roadmap places onboarding in Version `0.2`, the Inventory Directory in V
   cd quantify-inventory-system
   ```
 
-2. Install dependencies in both applications:
+2. Install dependencies in both applications with pnpm. The client and server remain separate packages:
 
   ```bash
-  cd quantify-ims
-  npm install
-  cd ../server
-  npm install
+  pnpm --dir quantify-ims install
+  pnpm --dir server install
   cd ..
   ```
 
@@ -96,30 +94,30 @@ The PRD roadmap places onboarding in Version `0.2`, the Inventory Directory in V
 
   ```bash
   cd server
-  npm run dev
+  pnpm dev
   ```
 
 5. Start the client in a second terminal:
 
   ```bash
   cd quantify-ims
-  npm run dev
+  pnpm dev
   ```
 
   Open `http://localhost:3000`. The client currently calls the API at `http://localhost:8080`, and the server CORS policy allows that local client origin.
 
 ## Useful Commands
 
-Run these from the relevant project directory:
+Run these from the relevant project directory with pnpm:
 
 ```bash
 # Client
-npm run dev
-npm run build
-npm run lint
+pnpm dev
+pnpm build
+pnpm lint
 
 # Server
-npm run dev
+pnpm dev
 ```
 
 The server package does not currently define a production `start` script or automated tests. Add focused tests when changing route behavior, authentication, or database operations.
