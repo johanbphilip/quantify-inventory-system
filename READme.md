@@ -16,23 +16,24 @@ Quantify Inventory System is a web application for digitizing and managing inven
 
 ### Client
 
-- Next.js 15 App Router with React 19 and TypeScript
+- Next.js 16.3+ App Router with React 19 and TypeScript
 - Tailwind CSS 4 for styling
-- Radix UI primitives and `lucide-react` for interface components and icons
+- ShadCN UI with Radix UI primitives and Heroicons for interface icons
 - TanStack Table for inventory and history tables
 - Zod for form validation
 - Next Themes and Sonner for theme and notifications
 - `fetch` in server actions for API calls; Axios is also configured in `quantify-ims/lib/axios.ts`
+- Vitest for unit and integration tests
 
 ### Server and Data
 
 - Node.js with native ES modules
 - Express for HTTP routing and middleware
-- Supabase JavaScript client for the `inventory` and `selections` tables and Supabase Auth
+- Firebase as the target BaaS provider, with Cloud Firestore as the planned database
 - HTTP-only access and refresh cookies for authenticated sessions
 - `cors` and `cookie-parser` for browser requests and session cookies
-- `jsonwebtoken` is installed, but the current authentication middleware validates Supabase tokens through Supabase Auth
-- Mongoose is present in the dependencies and model directory, but the active CRUD controllers query Supabase
+- The current server dependencies and controllers still contain Supabase integration; the application is being restarted around Firebase rather than migrated in place
+- Firebase Admin database access and token verification belong in the Express server
 
 ## Important Patterns
 
@@ -41,7 +42,7 @@ Quantify Inventory System is a web application for digitizing and managing inven
 - The Express server mounts authentication at `/auth`, protects `/api/*` with `authenticateRequest`, and exposes item and transaction resources below `/api`.
 - Authentication uses short-lived `access_token` and longer-lived `refresh_token` HTTP-only cookies. The API middleware refreshes the session when only a valid refresh token remains.
 - Shared client UI belongs in `quantify-ims/components/`; domain actions belong in `quantify-ims/lib/actions/`; shared types and schemas belong in `quantify-ims/lib/types/`.
-- Keep Supabase access on the server. Do not expose service credentials or move privileged database operations into client components.
+- Keep Firebase Admin access on the server. Do not expose service credentials or move privileged database operations into client components.
 
 ## Product Direction
 
@@ -60,7 +61,7 @@ The PRD roadmap places onboarding in Version `0.2`, the Inventory Directory in V
 
 - Node.js 20 or later
 - pnpm 10.34.3 or later
-- A Supabase project with the expected `inventory` and `selections` tables and Auth configured
+- A Firebase project and the server-side Firebase credentials required by the planned implementation
 
 ## Clone and Develop
 
@@ -83,12 +84,13 @@ The PRD roadmap places onboarding in Version `0.2`, the Inventory Directory in V
 
   ```env
   PORT=8080
-  SUPABASE_URL=https://your-project.supabase.co
-  ANON_KEY=your-supabase-anon-key
+  FIREBASE_PROJECT_ID=your-firebase-project-id
+  FIREBASE_CLIENT_EMAIL=your-service-account-client-email
+  FIREBASE_PRIVATE_KEY="your-service-account-private-key"
   NODE_ENV=development
   ```
 
-  Use your Supabase project's real URL and anon key. Do not commit `.env` files or credentials.
+  Use placeholders locally until Firebase setup is implemented. Do not commit `.env` files or credentials.
 
 4. Start the API in one terminal:
 
@@ -124,12 +126,15 @@ The server package does not currently define a production `start` script or auto
 
 ## Git and GitHub Workflow
 
-- Create a short-lived branch from an up-to-date `main`: `feature/<name>`, `fix/<name>`, or `docs/<name>`.
+- Use `develop` as the integration branch and `main` as the production branch.
+- Create a short-lived `feature/<name>`, `fix/<name>`, or `docs/<name>` branch from an up-to-date `develop` branch.
 - Keep commits small and focused. Use imperative commit subjects, for example, `docs: document local setup`.
-- Before opening a pull request, update your branch with `git fetch origin` followed by `git rebase origin/main`. Resolve conflicts locally and run the relevant checks again.
+- Before opening a pull request into `develop`, update your branch with `git fetch origin` followed by `git rebase origin/develop`. Resolve conflicts locally and run the relevant checks again.
 - Prefer rebase for keeping feature branches current; use merge commits only when the team explicitly requires them.
 - Never force-push shared branches. If a rebase rewrites your own branch, use `git push --force-with-lease`.
-- Open a pull request into `main` with a clear summary, testing notes, screenshots for UI changes, and any required Supabase or environment setup.
+- Open feature pull requests into `develop` with a clear summary, testing notes, screenshots for UI changes, and any required Firebase or environment setup.
+- Treat commits merged into `main` as production changes. Promote changes from `develop` to `main` only through a reviewed release pull request after successful end-to-end testing against the proposed release.
+- Do not commit directly to `main`.
 - Review the diff before pushing. Do not commit secrets, generated build output, `node_modules`, or unrelated formatting changes.
 - Keep pull requests reviewable. Separate refactors from behavior changes, and update `TODO.md` when a listed item changes state.
 
