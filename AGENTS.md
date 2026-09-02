@@ -19,6 +19,7 @@ Quantify Inventory System is an inventory application. The repository contains a
 
 - Read [READme.md](READme.md) for setup, architecture patterns, and GitHub workflow.
 - Read [product-requirement-document.md](product-requirement-document.md) for the approved product model and release boundaries.
+- Read [phases/phases.md](phases/phases.md) for the development phase progress index and links to detailed implementation plans.
 - Read [TODO.md](TODO.md) before selecting feature work.
 - Inspect the nearest route, server action, controller, or component before making a change. Keep the change within that ownership boundary unless the behavior crosses the client/API contract.
 

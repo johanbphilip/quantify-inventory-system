@@ -9,6 +9,7 @@ Quantify Inventory System is a web application for digitizing and managing inven
 | `quantify-ims/` | Next.js client application |
 | `server/` | Express API and authentication middleware |
 | `product-requirement-document.md` | Product requirements, data model, and versioned roadmap |
+| `phases/phases.md` | Development phase progress index and implementation-plan links |
 | `TODO.md` | Active feature backlog and product questions |
 | `AGENTS.md` | Repository guidance for contributors and coding agents |
 
