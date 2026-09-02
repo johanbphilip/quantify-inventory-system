@@ -6,6 +6,9 @@ This file tracks planned features, incomplete work, and implementation decisions
 
 ### Version 0.1: Organization Foundation
 
+- [ ] Define and register Firestore foundations for all application entities
+- [ ] Validate entity ownership, relationships, lifecycle, placement, and audit invariants
+- [ ] Document required Firestore indexes and persistence mappings for later operational APIs
 - [ ] Add organization and team data model
 - [ ] Provision the first Organization Admin through the approved manual process
 - [ ] Add static GUID organization join code handling
@@ -16,6 +19,7 @@ This file tracks planned features, incomplete work, and implementation decisions
 
 ### Version 0.2: Onboarding and Organization Configuration
 
+- [ ] Add operational API behavior for categories and locations on the Phase 1 persistence foundation
 - [ ] Create Organization Admin onboarding workspace
 - [ ] Allow Organization Admins to create teams
 - [ ] Allow Organization Admins to assign or invite Team Admins
@@ -31,7 +35,7 @@ This file tracks planned features, incomplete work, and implementation decisions
 
 ### Version 0.3: Inventory Directory
 
-- [ ] Replace the item-centric inventory contract with Catalog Item and Asset contracts
+- [ ] Add operational Catalog Item and Asset APIs on the Phase 1 persistence foundation
 - [ ] Add bulk Catalog Items with direct quantities and no Asset records
 - [ ] Add unique Catalog Items with one Asset record per physical unit
 - [ ] Derive total, available, checked-out, and exception counts from Asset records
@@ -55,7 +59,7 @@ This file tracks planned features, incomplete work, and implementation decisions
 
 ### Version 1.1: Kits and Exceptions
 
-- [ ] Add team-owned Kits with `organization_id` and `team_id`
+- [ ] Add operational team-owned Kit APIs using the Phase 1 persistence foundation and `organization_id`/`team_id`
 - [ ] Allow Kits to contain Assets or whole bulk Catalog Items, but not other Kits
 - [ ] Allow an Asset to move into a Kit owned by another team while retaining its Catalog Item ownership
 - [ ] Add full and acknowledged partial Kit checkout
@@ -64,7 +68,7 @@ This file tracks planned features, incomplete work, and implementation decisions
 
 ### Version 2.0 and later
 
-- [ ] Add team-owned Flow templates and single-operator sessions
+- [ ] Add operational team-owned Flow templates and single-operator sessions using the Phase 1 persistence foundation
 - [ ] Allow Session Records to be edited for one week after closure, logging every edit
 - [ ] Add collaborative sessions, notifications, real-time synchronization, and reporting
 - [ ] Add organization-owned master event Flows with editable team-owned child Flows

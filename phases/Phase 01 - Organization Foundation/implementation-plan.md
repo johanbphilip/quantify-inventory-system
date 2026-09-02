@@ -2,9 +2,9 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use `subagent-driven-development` (recommended) or `executing-plans` to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Establish the Firebase and Express foundation for organizations, teams, users, memberships, invitations, join requests, and API-level organization boundaries, beginning with user-owned Firebase project setup.
+**Goal:** Establish the Firebase and Express foundation for the complete application entity model, while implementing organization, team, user, membership, invitation, and join-request API boundaries.
 
-**Architecture:** The user first creates and configures the Firebase project, enables Firebase Authentication, creates the Cloud Firestore database, and provides local server credentials. Firebase Authentication then owns the authenticated account and provides the stable user UID. Cloud Firestore stores the user profile, organization, team, membership, invitation, and join-request records. Express is the only owner of privileged Firestore access and verifies Firebase ID tokens before applying organization and team authorization. The Next.js client consumes typed API contracts and does not access Firebase Admin services.
+**Architecture:** The user first creates and configures the Firebase project, enables Firebase Authentication, creates the Cloud Firestore database, and provides local server credentials. Firebase Authentication owns the authenticated account and provides the stable user UID. Cloud Firestore establishes collection paths, contracts, relationships, persistence mappings, and indexes for all application entities: organization, team, user, membership, invitation, join request, category, location, catalog item, asset, kit, flow, flow session, session record, transaction, and audit record. Express is the only owner of privileged Firestore access and verifies Firebase ID tokens before applying organization and team authorization. The Next.js client consumes typed API contracts and does not access Firebase Admin services.
 
 **Tech Stack:** Node.js ES modules, Express, Firebase Admin SDK, Cloud Firestore, Firebase Authentication, Next.js 16.3+ App Router, TypeScript, Zod, Tailwind CSS 4, ShadCN UI, Heroicons, and Vitest.
 
@@ -21,7 +21,7 @@
 - Organization Admins can view organization-wide data, but inventory mutation authorization remains team-scoped for later inventory releases.
 - A valid organization join code identifies an organization but does not grant membership.
 - First Organization Admin provisioning remains manual or support-controlled.
-- Phase 1 excludes categories, locations, Catalog Items, Assets, Kits, Flows, inventory transactions, onboarding UI, and organization-wide inventory mutation.
+- Phase 1 excludes onboarding UI and operational API behavior for categories, locations, Catalog Items, Assets, Kits, Flows, Flow Sessions, Session Records, inventory transactions, and audit workflows. Their server-side persistence contracts, relationships, invariants, and required indexes are included.
 - Do not add Firebase Emulator Suite or Playwright. Use Vitest with test doubles or isolated test fixtures for automated tests.
 - Preserve the existing `/auth` and `/api` route mounts while replacing Supabase-backed authentication and persistence.
 - Firebase project setup is a manual prerequisite owned by the user; agents must not create, rotate, or request secret credentials.
@@ -38,15 +38,17 @@
 - Per-user permissions in addition to role defaults.
 - Membership states for invited, pending, active, rejected, and revoked access.
 - Invitation and join-request records sufficient to support the Version 0.1 approval flow.
+- Persistence contracts and Firestore collection definitions for categories, locations, Catalog Items, Assets, Kits, team Flow templates, master event Flows, Flow Sessions, Session Records, transactions, and audit records.
+- Cross-entity relationship and placement invariants required by the PRD, including bulk-versus-unique tracking, exclusive Location/Kit placement, non-nested Kits, and append-only audit records.
+- Firestore field mappings, collection paths, query indexes, and repository boundaries ready for later operational APIs.
 - Manual first-admin provisioning boundary.
 - Authenticated Express requests with organization and team authorization.
 - Client-side TypeScript types, Zod schemas, and enums for these contracts.
 
 ### Deferred
 
-- Organization onboarding workspace and setup progress, which belong to Version 0.2.
-- Team categories, custom fields, required fields, and locations, which belong to Version 0.2.
-- Catalog Items, Assets, inventory status, check-in/check-out, and audit history for inventory mutations, which belong to later releases.
+- Onboarding workspace and setup progress, which belong to Version 0.2.
+- Operational CRUD, checkout/check-in, scanning, Flow execution, Session Record editing, notifications, and audit mutation workflows, which belong to later releases.
 - Browser-side Firebase SDK integration. The client should use the Express API unless a later requirement proves browser Firebase behavior necessary.
 
 ### User-Owned Prerequisite
@@ -72,6 +74,16 @@ teams/{teamId}
 memberships/{membershipId}
 invitations/{invitationId}
 joinRequests/{joinRequestId}
+categories/{categoryId}
+locations/{locationId}
+catalogItems/{catalogItemId}
+assets/{assetId}
+kits/{kitId}
+flows/{flowId}
+flowSessions/{flowSessionId}
+sessionRecords/{sessionRecordId}
+transactions/{transactionId}
+auditRecords/{auditRecordId}
 ```
 
 Required relationships and invariants:
@@ -82,6 +94,11 @@ Required relationships and invariants:
 - A user may have memberships in multiple teams within one organization.
 - Membership records must be unique for the `(userId, organizationId, teamId)` tuple.
 - Invitation and join-request records carry `organizationId`, optional `teamId`, requester/issuer identity, status, and timestamps.
+- Categories, Catalog Items, Kits, and team Flow templates carry both `organizationId` and `teamId`; Locations are organization-owned; Assets retain Catalog Item ownership even when placed in another team's Kit.
+- Catalog Items explicitly use `bulk` or `unique` tracking; bulk records carry quantity and never create Asset records, while unique records are represented by Asset records.
+- Bulk Catalog Items and Assets have an exclusive placement choice between a Location, a Kit, or an explicit unknown-placement state. Kits have a Location and cannot contain Kits.
+- Flow Sessions reference a Flow template, Session Records reference the completed session and involved inventory, and Transactions reference the affected inventory and acting user.
+- Audit Records are append-only and carry the actor, action, timestamp, affected entity, and relevant before/after values or exception explanation.
 - All mutable records carry `createdAt`, `updatedAt`, `createdBy`, and `updatedBy`; approval/rejection/revocation events carry actor and event timestamps.
 
 ## File Map
@@ -93,6 +110,10 @@ Required relationships and invariants:
 - `server/models/team.models.js`: team data contracts.
 - `server/models/user.models.js`: user profile and membership contracts.
 - `server/models/membership.models.js`: membership, invitation, and join-request contracts.
+- `server/models/inventory.models.js`: category, location, Catalog Item, Asset, and placement contracts.
+- `server/models/workflow.models.js`: Kit, Flow, Flow Session, and Session Record contracts.
+- `server/models/audit.models.js`: transaction and append-only audit record contracts.
+- `server/utils/firestoreSchema.js`: collection paths, relationship mappings, and index requirements for every Phase 1 entity.
 - `server/middleware/authMiddleware.js`: verify Firebase ID tokens and attach authenticated identity.
 - `server/middleware/organizationAuthorization.js`: enforce organization/team membership and role/permission checks.
 - `server/controllers/organization/organization.controllers.js`: organization and first-admin operations.
@@ -159,30 +180,31 @@ Required relationships and invariants:
 
 - **Tech:** Confirm whether local development will use a service-account environment credential or `GOOGLE_APPLICATION_CREDENTIALS` supplied outside the repository. Starting recommendation: use environment variables for local consistency with the current project guidance and a managed workload identity in deployment.
 
-### [ORG 1.2] - Define organization and membership domain contracts
+### [ORG 1.2] - Define complete domain contracts and Firestore invariants
 
 **Issue type:** Technical task
 
-**Summary:** Define the server-side data contracts and invariants for organizations, teams, Firebase-authenticated user profiles, memberships, invitations, and join requests.
+**Summary:** Define the server-side data contracts and invariants for every Phase 1 Firestore entity, with organization and membership contracts detailed enough to support the initial API workflows.
 
-**Background / Context:** Version 0.1 requires a secure organization boundary before inventory work begins. The PRD permits users to belong to multiple teams, requires explicit organization and Team Admin approval, and defines four role levels plus per-user permissions. Firestore data must preserve these relationships without allowing a user or team to cross organization boundaries.
+**Background / Context:** Version 0.1 requires a secure organization boundary before inventory work begins, but later inventory and workflow releases depend on stable entity relationships now. The PRD permits users to belong to multiple teams, requires explicit organization and Team Admin approval, and defines Catalog Item/Asset tracking, exclusive placement, Kits, Flows, Sessions, Transactions, and audit history. Firestore contracts must preserve these relationships without allowing a user, team, or inventory record to cross organization boundaries.
 
 **Scope:**
 
-- **In scope:** JavaScript model modules under `server/models/`, Zod schemas for external data, role/permission/status constants, ID and timestamp conventions, and documented uniqueness/relationship invariants.
+- **In scope:** JavaScript model modules under `server/models/` for organization, team, user, membership, invitation, join request, category, location, Catalog Item, Asset, Kit, Flow, Flow Session, Session Record, transaction, and audit record; Zod schemas for external data; role/permission/status constants; ID and timestamp conventions; and documented uniqueness, ownership, relationship, placement, and lifecycle invariants.
 - **Nice to have:** A small pure helper for deriving baseline permissions from a role.
-- **Deferred:** Categories, locations, inventory entities, and onboarding configuration.
+- **Deferred:** Operational CRUD, checkout/check-in, Flow execution, Session Record editing, and onboarding configuration.
 - **Excluded / Out of scope:** Firestore initialization and HTTP routes; those are subsequent tasks.
 
 **Acceptance Criteria:**
 
-1. Organization, team, user profile, membership, invitation, and join-request contracts define required fields, optional fields, statuses, roles, and timestamps.
+1. Organization, team, user profile, membership, invitation, join-request, category, location, Catalog Item, Asset, Kit, Flow, Flow Session, Session Record, transaction, and audit-record contracts define required fields, optional fields, statuses, ownership, and timestamps.
 2. User identity uses the Firebase Authentication UID as `userId`.
 3. Membership contracts support one user in multiple teams and include `organizationId`, `teamId`, `userId`, `role`, `permissions`, and status.
 4. The contracts represent organization approval separately from team-specific approval so a team approval cannot activate organization access by itself.
 5. The contracts define a static organization join code and make clear that code validation does not create membership.
 6. Invalid role, permission, status, missing organization scope, and missing relationship identifiers are rejected by Zod schemas.
-7. Unit tests cover valid records, invalid records, duplicate-membership detection input, and role-to-permission derivation if that helper is created.
+7. Catalog Item tracking mode, Asset ownership, exclusive Location/Kit placement, non-nested Kit contents, Flow references, Session Record immutability metadata, transaction references, and append-only audit constraints are represented and validated.
+8. Unit tests cover valid records, invalid records, duplicate-membership detection input, relationship violations, placement violations, and role-to-permission derivation if that helper is created.
 
 **Technical Notes:** Use camelCase in JavaScript/API contracts and map fields consistently to Firestore. Use ISO strings at the API boundary and Firestore `Timestamp` values only inside the server persistence layer. Do not model a team-less membership as a workaround for organization administration without documenting the chosen organization-admin representation.
 
@@ -196,13 +218,13 @@ Required relationships and invariants:
 
 **Issue type:** Technical task
 
-**Summary:** Replace the Supabase database connection surface with a server-only Firebase Admin initialization module and Firestore access boundary.
+**Summary:** Replace the Supabase database connection surface with a server-only Firebase Admin initialization module and Firestore access boundary that is ready for every Phase 1 entity.
 
 **Background / Context:** The repository currently initializes Supabase in `server/utils/dbConn.js`, while the target stack requires Firebase and Cloud Firestore. Every later organization operation depends on one reliable, testable Admin SDK initialization path.
 
 **Scope:**
 
-- **In scope:** `firebase-admin` dependency, environment validation, Admin app initialization, Firestore/Auth exports, server-only utility boundaries, and replacement of direct Supabase connection imports in the new organization modules.
+- **In scope:** `firebase-admin` dependency, environment validation, Admin app initialization, Firestore/Auth exports, server-only utility boundaries, replacement of direct Supabase connection imports in the new organization modules, collection path registration for every Phase 1 entity, persistence timestamp/reference conversion, and documented Firestore composite index definitions for required query shapes.
 - **Nice to have:** A safe startup diagnostic that reports missing configuration names without logging secrets.
 - **Deferred:** Removal of all legacy Supabase CRUD/auth code; do that with the broader Firebase restart work after this foundation is proven.
 - **Excluded / Out of scope:** Client Firebase SDK configuration and browser persistence.
@@ -214,8 +236,10 @@ Required relationships and invariants:
 3. Firestore and Firebase Auth services are available to server-side consumers through one utility boundary.
 4. No client-importable module contains Firebase Admin initialization or service-account credentials.
 5. The configuration module supports the multiline `FIREBASE_PRIVATE_KEY` environment value and normalizes escaped newlines.
-6. Unit tests cover successful initialization through injected configuration and failure when required values are absent, without requiring Firebase Emulator Suite.
-7. The server package documents and scripts the Vitest command without claiming that a live Firebase project is available in automated tests.
+6. One server-only schema/repository boundary exposes stable collection paths and conversion helpers for all Phase 1 entities without creating client-importable Admin code.
+7. Required Firestore query indexes and relationship query shapes are documented or represented in deployable configuration; no manual collection creation is required because collections are created by validated writes.
+8. Unit tests cover successful initialization through injected configuration, failure when required values are absent, collection/path mappings, and timestamp/reference conversion without requiring Firebase Emulator Suite.
+9. The server package documents and scripts the Vitest command without claiming that a live Firebase project is available in automated tests.
 
 **Technical Notes:** Prefer `applicationDefault()` when deployment credentials are supplied through the runtime, with explicit `FIREBASE_PROJECT_ID`, `FIREBASE_CLIENT_EMAIL`, and `FIREBASE_PRIVATE_KEY` support for local/server environments. Keep the initialization API injectable so tests do not create a live Admin app.
 
@@ -261,7 +285,7 @@ Required relationships and invariants:
 
 - **In scope:** `server/routes/organization.router.js`, organization/team/membership controllers, Firestore repositories or utilities, authorization middleware, request validation, and route registration under the existing Express app.
 - **Nice to have:** Pagination for pending invitations and join requests if it does not change the core contract.
-- **Deferred:** Onboarding workspace, category/location configuration, and inventory endpoints.
+- **Deferred:** Onboarding workspace and operational endpoints for categories, locations, inventory, Kits, Flows, Sessions, transactions, and audit workflows. This task only exposes organization, team, user, membership, invitation, and join-request actions.
 - **Excluded / Out of scope:** Client UI; only the API contract is established here.
 
 **Acceptance Criteria:**
@@ -351,13 +375,13 @@ Required relationships and invariants:
 - Use TDD for behavior changes: write a focused failing Vitest test, run it to confirm the expected failure, implement the smallest change, then rerun the focused test and the package suite.
 - Keep commits small and imperative. Commit task-sized changes on a branch created from `develop`; do not commit directly to `main`.
 - After each task, review authorization implications and API contract changes before starting the next task.
-- Do not add implementation for deferred Version 0.2 or later entities while completing Phase 1.
+- Do not add implementation for deferred Version 0.2 or later entity behavior while completing Phase 1; their persistence contracts and Firestore building blocks are explicitly in scope.
 
 ## Phase 1 Exit Checklist
 
 - [ ] Firebase Admin initializes safely on the server.
 - [ ] Firebase-authenticated identity reaches protected Express routes.
-- [ ] Organization, team, user, membership, invitation, and join-request contracts are validated.
+- [ ] All application entity contracts, relationships, invariants, and Firestore collection/index definitions are validated.
 - [ ] Organization and team authorization is enforced by Express.
 - [ ] First-admin provisioning is manual/support-controlled.
 - [ ] Join-code requests require approval before access.
